@@ -24,7 +24,6 @@ import { auth } from './firebase';
 import { useProfile } from './context/ProfileContext';
 import { Link as RouterLink } from 'react-router-dom'; 
 import HeaderLogo from './assets/logo_header.png';
-import { red } from '@mui/material/colors';
 
 const App = ({ mode, toggleMode }) => {
   const { cart } = useCart();
@@ -76,12 +75,14 @@ const App = ({ mode, toggleMode }) => {
               </Button>
             )}
 
-            {/* Cart */}
-            <IconButton color="inherit" onClick={() => navigate('/order')}>
-              <Badge badgeContent={itemCount} color="secondary">
-                <ShoppingCartIcon />
-              </Badge>
-            </IconButton>
+            {/* Cart (visible only to logged-in users) */}
+            {user && (
+              <IconButton color="inherit" onClick={() => navigate('/order')}>
+                <Badge badgeContent={itemCount} color="secondary">
+                  <ShoppingCartIcon />
+                </Badge>
+              </IconButton>
+            )}
 
             {/* Theme Toggle */}
             <IconButton color="inherit" onClick={toggleMode}>

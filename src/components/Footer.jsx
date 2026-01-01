@@ -130,7 +130,7 @@ const Footer = () => {
           }}
         >
           <MuiLink
-            href="mailto:hello@Green Basket.com"
+            href="mailto:help@Green Basket.com"
             variant="body2"
             color="text.primary"
             sx={{
@@ -145,10 +145,10 @@ const Footer = () => {
             }}
           >
             <EmailIcon fontSize="small" />
-            hello@green-basket.com
+            help@green-basket.com
           </MuiLink>
           <Typography variant="body2" color="text.secondary">
-            Pune Market Yard
+            Haryana Market Association
           </Typography>
         </Box>
       </Box>
