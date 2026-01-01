@@ -17,7 +17,7 @@ import ContactPage from './pages/ContactPage';
 import OrderPage from './pages/OrderPage';
 import ProfilePage from './pages/ProfilePage';
 import { useCart } from './context/CartContext';
-import Footer from './Components/Footer';
+import Footer from './components/Footer';
 import InventoryPage from './pages/Inventory';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
