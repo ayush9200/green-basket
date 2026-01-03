@@ -15,3 +15,9 @@ yarn-error.log*
 /.nuxt
 /.cache
 /public/build
+
+# Environment variables with secrets
+.env
+.env.local
+.env.*.local
+
