@@ -7,8 +7,6 @@ import {
   Grid,
   Card,
   CardMedia,
-  CardContent,
-  CardActions,
   Button,
   Chip,
   IconButton,
@@ -135,7 +133,7 @@ const HomePage = () => {
         ) : active ? (
           <Box sx={{ fontSize: 18 }}>●</Box>
         ) : (
-          <Box className="QunatStepIcon-circle" sx={{ mt:2}} />
+          <Box className="QunatStepIcon-circle" sx={{ mt: 2 }} />
         )}
       </QunatStepIconRoot>
     );
@@ -237,7 +235,7 @@ const HomePage = () => {
             position: 'absolute',
             left: 24,
             top: '50%',
-            display:'none',
+            display: 'none',
             transform: 'translateY(-50%)',
             width: 56,
             height: 56,
@@ -257,7 +255,7 @@ const HomePage = () => {
             transform: 'translateY(-50%)',
             width: 56,
             height: 56,
-            display:'none',
+            display: 'none',
             bgcolor: 'rgba(255,255,255,0.2)',
             backdropFilter: 'blur(10px)',
             '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
@@ -312,51 +310,73 @@ const HomePage = () => {
           }}>
             {[...rows.slice(0, 10)].map((row, idx) => (
               (row.featured === "Yes" || row.featured === "yes") &&
-              <Paper
+              <Card
                 key={`${row.sku || row.name}-${idx}`}
                 variant='outlined'
                 sx={{
-                  minWidth: { xs: 280, md: 320 },
+                  width: { xs: 260, sm: 280, md: 300, lg: 320 }, // uniform width
                   height: "100%",
+                  display: 'flex',
+                  flexDirection: 'column',
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
                   elevation: 4,
                   overflow: 'hidden',
                   transition: 'transform 0.3s ease',
                   '&:hover': {
-                    transform: 'translateY(-12px)',
-                    boxShadow: 4,
-                    animationPlayState: 'spin 3s infinite linear', // Pause animation on hover
-                  }
+                    transform: 'translateY(-8px)',
+                    backgroundColor: "#e0ece1ff"
+                  },
                 }}
               >
                 {row.imageUrl && (
                   <CardMedia
                     component="img"
-                    height="200"
-                    width="320"
+                    sx={{
+                      aspectRatio: 1,           // square → perfect uniformity
+                      height: { xs: 200, sm: 220, md: 240 },
+                      width: '100%',
+                      objectFit: 'cover',       // crops consistently
+                    }}
                     image={row.imageUrl}
                     alt={row.name}
                   />
                 )}
-                <Box sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
-                    {row.name}
-                  </Typography>
-                  <Typography variant="h5" sx={{ mb: 1, color: 'primary.main', fontWeight: 700 }}>
-                    ₹{row.pricePerKg || row.price}/kg
-                  </Typography>
+                <Box sx={{
+                  p: { xs: 1.5, sm: 2, md: 2.5 }, // tighter on mobile
+                  flexGrow: 1,                    // content fills remaining space
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}>
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
+                      {row.name}
+                    </Typography>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        mb: 2,
+                        color: 'primary.main',
+                        fontWeight: 700,
+                        fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                      }}
+                    >
+                      ₹{row.pricePerKg || row.price}/kg
+                    </Typography>
+                  </Box>
                   <Button
                     fullWidth
                     variant="contained"
                     size="small"
-                    sx={{ borderRadius: "50" }}
+                    sx={{ borderRadius: 2 }}
                     onClick={() => handleAddToCart(row)}
                   >
                     Quick Add
                   </Button>
                 </Box>
-              </Paper>
+              </Card>
+
             ))}
           </Box>
         </Box>
@@ -381,7 +401,7 @@ const HomePage = () => {
       </Box>
 
       {/* 3. FULL WIDTH TRUSTED PARTNERS */}
-      <Box sx={{ py: 8, px:3 }}>
+      <Box sx={{ py: 8, px: 3 }}>
         <Container maxWidth="lg">
           <Typography variant="h3" sx={{ mb: 1, textAlign: 'center', fontWeight: 800 }}>
             Trusted Partners
@@ -411,7 +431,8 @@ const HomePage = () => {
                   boxShadow: 2,
                   '&:hover': {
                     transform: 'scale(1.05)',
-                    boxShadow: 4,
+                    variant: 'outlined',
+                    backgroundColor: "#e0ece1ff"
                   }
                 }}
               >
@@ -430,7 +451,7 @@ const HomePage = () => {
 
       <Container sx={{ py: 12 }}>
         <Grid container spacing={4} alignItems="center">
-          <Grid item xs={12} md={12} sx={{pl:2}} alignItems="center">
+          <Grid item xs={12} md={12} sx={{ pl: 2 }} alignItems="center">
             <Typography variant="h3" sx={{ mb: 3, fontWeight: 800, lineHeight: 1.2 }}>
               What Makes Us Different
             </Typography>
@@ -492,7 +513,7 @@ const HomePage = () => {
           </Typography>
         </Box>
 
-        <Box sx={{ maxWidth: 900, mx: 'auto', alignItems:"center", }}>
+        <Box sx={{ maxWidth: 900, mx: 'auto', alignItems: "center", }}>
           <Stepper
             activeStep={-1}
             alternativeLabel
@@ -501,13 +522,13 @@ const HomePage = () => {
             sx={{
               pt: 4,
               pb: 6,
-              alignItems:"center",
+              alignItems: "center",
               '& .MuiStepLabel-iconContainer': {
                 transform: 'scale(1.2)',
               }
             }}
           >
-            <Step sx={{alignItems:"center",}}>
+            <Step sx={{ alignItems: "center", }}>
               <StepLabel StepIconComponent={QunatStepIcon}>
                 <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
@@ -517,7 +538,7 @@ const HomePage = () => {
                     Save business details once
                   </Typography>
                   <Button component={RouterLink} to="/profile" size="small" variant="contained"
-                    sx={{ mt: 1, px: 2, borderRadius:10 }}
+                    sx={{ mt: 1, px: 2, borderRadius: 10 }}
                   >
                     Profile →
                   </Button>
@@ -527,7 +548,7 @@ const HomePage = () => {
 
             <Step>
               <StepLabel StepIconComponent={QunatStepIcon}>
-                 <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
+                <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
                     Add Items
                   </Typography>
@@ -535,7 +556,7 @@ const HomePage = () => {
                     Browse fresh inventory
                   </Typography>
                   <Button component={RouterLink} to="/inventory" size="small" variant="contained"
-                    sx={{ mt: 1, px: 2, borderRadius:10 }}
+                    sx={{ mt: 1, px: 2, borderRadius: 10 }}
                   >
                     Browse →
                   </Button>
@@ -553,7 +574,7 @@ const HomePage = () => {
                     Review cart & send
                   </Typography>
                   <Button component={RouterLink} to="/order" size="small" variant="contained"
-                    sx={{ mt: 1, px: 2, borderRadius:10 }}
+                    sx={{ mt: 1, px: 2, borderRadius: 10 }}
                   >
                     Cart →
                   </Button>
@@ -563,21 +584,21 @@ const HomePage = () => {
 
             <Step>
               <StepLabel StepIconComponent={QunatStepIcon}>
-                 <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
+                <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
                     Team Confirms
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Via WhatsApp chat
                   </Typography>
-                   <Chip label="Within 30 mins" color="success" size="medium" sx={{ mt: 1 }} />
+                  <Chip label="Within 30 mins" color="success" size="medium" sx={{ mt: 1 }} />
                 </Stack>
               </StepLabel>
             </Step>
 
             <Step>
               <StepLabel StepIconComponent={QunatStepIcon}>
-                 <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
+                <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
                     Delivered + Invoice
                   </Typography>

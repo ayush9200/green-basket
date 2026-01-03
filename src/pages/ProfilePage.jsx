@@ -1,11 +1,7 @@
-// src/pages/ProfilePage.jsx - EDIT + AUTH MODES
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, TextField, Button, Alert, Card, CardContent,
-  Grid, FormControlLabel, Checkbox, Link, CircularProgress, ToggleButton, ToggleButtonGroup,
-  Divider, Paper, useTheme,
-  CardHeader,
-  Stack,
+  Grid, FormControlLabel, Checkbox, Link, CircularProgress, Divider, useTheme, Stack,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import {
@@ -34,6 +30,7 @@ const ProfilePage = () => {
   const isEditMode = !!user && !!profile;
 
   const [isSignup, setIsSignup] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [form, setForm] = useState({
     name: '', email: '', password: '', business: '', phone: '',
     address: '', gst: '', termsAccepted: false
@@ -114,9 +111,10 @@ const ProfilePage = () => {
 
         // Decide where to go based on email (or claims later)
         if (isAdminEmail(loggedInUser.email)) {
-          navigate('/admin'); // Admin dashboard route
+          setIsAdmin(true);
+          navigate('/admin');
         } else {
-          navigate('/order'); // regular user flow
+          navigate('/order');
         }
       }
     } catch (err) {
@@ -135,61 +133,6 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
-
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError('');
-  //   setSuccess('');
-
-  //   try {
-  //     if (isEditMode) {
-  //       // UPDATE PROFILE
-  //       if (user) {
-  //         // Update Firebase Auth display name
-  //         await updateUserProfile(user, { displayName: form.name });
-
-  //         // Update Firestore profile
-  //         await updateDoc(doc(db, 'customers', user.uid), {
-  //           ...form,
-  //           updatedAt: new Date(),
-  //         });
-
-  //         setSuccess('Profile updated successfully!');
-  //       }
-  //     } else if (isSignup) {
-  //       // CREATE NEW ACCOUNT
-  //       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
-  //       const user = userCredential.user;
-  //       await setDoc(doc(db, 'customers', user.uid), {
-  //         ...form, uid: user.uid, createdAt: new Date(), updatedAt: new Date()
-  //       });
-  //       navigate('/order');
-  //     } else {
-  //       // LOGIN
-  //       await signInWithEmailAndPassword(auth, form.email, form.password);
-  //       navigate('/order');
-  //     }
-  //   } catch (err) {
-  //     setError(isEditMode 
-  //       ? 'Failed to update profile' 
-  //       : (isSignup 
-  //         ? (err.code === 'auth/email-already-in-use' ? 'Email already registered' : err.message)
-  //         : (err.code === 'auth/wrong-password' ? 'Invalid email/password' : err.message)
-  //       )
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const isFormValid = isEditMode 
-  //   ? (form.name && form.business && form.phone && form.address)
-  //   : (isSignup 
-  //     ? (form.name && form.email && form.password && form.business && form.phone && form.address && form.termsAccepted)
-  //     : (form.email && form.password)
-  //   );
 
   const isFormValid = isEditMode
     ? (form.name && form.business && form.phone && form.address)
@@ -417,6 +360,17 @@ const ProfilePage = () => {
         {isEditMode && (
           <Box sx={{ mt: 4, textAlign: 'center' }}>
             <Grid container spacing={2} justifyContent="center">
+              {(isAdmin) ?
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    component={RouterLink}
+                    to="/admin"
+                  >
+                    Go to Admin Dashboard
+                  </Button>
+                </Grid>
+                :
               <Grid item>
                 <Button
                   variant="outlined"
@@ -427,6 +381,7 @@ const ProfilePage = () => {
                   Go to Orders
                 </Button>
               </Grid>
+}
               <Grid item>
                 <Button
                   variant="contained"

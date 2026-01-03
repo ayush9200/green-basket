@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import Box from '@mui/joy/Box';
 import Sheet from '@mui/joy/Sheet';
 import Stack from '@mui/joy/Stack';
 import Typography from '@mui/joy/Typography';
@@ -8,10 +7,17 @@ import Input from '@mui/joy/Input';
 import Table from '@mui/joy/Table';
 import Chip from '@mui/joy/Chip';
 import { db } from '../firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import { Button } from '@mui/joy';
+import emailjs from '@emailjs/browser';
 
 export default function OrdersTab() {
   const [orders, setOrders] = React.useState([]);
   const [search, setSearch] = React.useState('');
+
+  const APPROVED_TEMPLATE_ID = 'template_u6oix7c'; 
+  const SERVICE_ID = 'service_04pjjft';
+  const PUBLIC_KEY = '0_1u1VbZliYOiBuT_'; 
 
   React.useEffect(() => {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
@@ -40,6 +46,42 @@ export default function OrdersTab() {
       (o.address || '').toLowerCase().includes(term)
     );
   });
+
+  const approveOrder = async (orderDetailsl) => {
+  await updateDoc(doc(db, 'orders', orderId), {
+    status: 'Approved',
+    approvedAt: new Date(),
+  });
+
+  // WhatsApp confirmation to user
+  const confirmMsg = `✅ *Order #${orderId} CONFIRMED!*\n\n` +
+    `Ready for delivery. Please coordinate pickup/delivery timing via WhatsApp.`;
+
+  // const confirmUrl = `https://wa.me/${userPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(confirmMsg)}`;
+  // window.open(confirmUrl, '_blank');
+
+  // Email confirmation via EmailJS
+  await emailjs.send(SERVICE_ID, APPROVED_TEMPLATE_ID, {
+        business: profile.business,
+        phone: profile.phone,
+        email: profile.email,
+        address: profile.address,
+        order_id: orderId,
+
+        items: cart.map(item => [
+          item.imageUrl || '',
+          item.name,
+          `${item.quantity}${item.unit || 'kg'}`,
+          `₹${item.pricePerKg * item.quantity}` // {{item_price}}
+        ]),
+
+        'shipping': 'Free Cash on Delivery',
+        'total': `₹${totalAmount}`,
+
+        to_email: profile.email,
+
+      }, PUBLIC_KEY);
+};
 
   return (
     <Stack spacing={1.5}>
@@ -83,6 +125,8 @@ export default function OrdersTab() {
               <th>Order</th>
               <th>Source</th>
               <th>Created</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -100,13 +144,32 @@ export default function OrdersTab() {
                 <td>
                   {o.createdAt
                     ? o.createdAt.toLocaleString(undefined, {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
                     : '—'}
+                </td>
+                <td>
+                  <Chip
+                    color={o.status === 'Approved' ? 'success' : 'warning'}
+                    size="sm"
+                  >
+                    {o.status || 'Pending'}
+                  </Chip>
+                </td>
+                <td style={{justifyContent:"center", alignContent:"center", alignItems:"center"}}>
+                  {o.status !== 'Approved' && (
+                    <Button
+                      size="sm"
+                      variant="soft"
+                      onClick={(o) => approveOrder(o)}
+                    >
+                      Approve
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}

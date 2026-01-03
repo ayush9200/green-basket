@@ -34,7 +34,6 @@ const InventoryPage = () => {
     const [quantities, setQuantities] = useState({});
     const [filter, setFilter] = useState('All');
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(0);
     const pageSize = 15;
     const [visibleCount, setVisibleCount] = useState(pageSize);
     const [snackbar, setSnackbar] = useState({ open: false, message: '' });
@@ -55,7 +54,7 @@ const InventoryPage = () => {
         return (matchesSearch || indianNameSearch) && matchesFilter && hasStock;
     });
 
-      useEffect(() => {
+    useEffect(() => {
         setVisibleCount(pageSize);
     }, [search, filter]);
 
@@ -134,68 +133,105 @@ const InventoryPage = () => {
                         <Typography>No products match your filters</Typography>
                     ) : (
                         <>
-                        <Grid container spacing={4}>
-                            {displayedRows.map((row) => (
-                                (row.active === "Yes" || row.active === "yes") && (
-                                    <Grid item xs={6} sm={6} md={3} key={row.sku || row.name}>
-                                        <Card
+                            <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+                                {displayedRows.map((row) => (
+                                    (row.active === "Yes" || row.active === "yes") && (
+                                        <Grid
+                                            item
+                                            xs={6}
+                                            sm={4}
+                                            md={4}
+                                            lg={3}
+                                            xl={2.4}
+                                            key={row.sku || row.name}
                                             sx={{
-                                                height: '100%',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                boxShadow: 2,
-                                                '&:hover': {
-                                                    boxShadow: 1,
-                                                    transform: 'translateY(-8px)',
-                                                    variant: 'outlined',
-                                                    backgroundColor: "#e0ece1ff"
-
-                                                },
+                                                // Prevents overflow, allows full-width feel
+                                                minWidth: 0,
+                                                padding: { xs: 0.5, sm: 0.75, md: 1 }
                                             }}
                                         >
-                                            {row.imageUrl ? (
+                                            <Card
+                                                sx={{
+                                                    height: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    boxShadow: 2,
+                                                    // Wider cards that fill space better
+                                                    width: {
+                                                        xs: 'calc(50vw - 8px)',  // nearly full width on mobile
+                                                        sm: 250,
+                                                        md: 280,
+                                                        lg: 320,
+                                                        xl: 340
+                                                    },
+                                                    '&:hover': {
+                                                        boxShadow: 1,
+                                                        transform: 'translateY(-8px)',
+                                                        backgroundColor: "#e0ece1ff"
+                                                    },
+                                                }}
+                                            >
+                                                {/* Image - same as before */}
                                                 <CardMedia
                                                     component="img"
-                                                    image={row.imageUrl}
+                                                    image={row.imageUrl || "https://placehold.co/300x300/e0e0e0/636363?text=No+Image"}
                                                     alt={row.name}
-                                                    loading="eager"
-                                                    decoding="async"
-                                                    sx={{ width: 350, height: 220, objectFit: 'cover', display: 'block' }}
+                                                    sx={{
+                                                        aspectRatio: 1,
+                                                        height: { xs: 140, sm: 170, md: 200, lg: 220 },
+                                                        width: '100%',
+                                                        objectFit: 'cover',
+                                                    }}
                                                 />
-                                            ) : (
-                                                <CardMedia
-                                                    component="img"
-                                                    image={"https://placehold.co/300x300/e0e0e0/636363?text=No+Image"}
-                                                    alt={row.name}
-                                                    loading="eager"
-                                                    decoding="async"
-                                                    sx={{ width: 350, height: 220, objectFit: 'cover', display: 'block' }}
-                                                />
-                                            )}
-                                            <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                                                <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
-                                                    {row.name}
-                                                </Typography>
-                                                {row.category && (
-                                                    <Chip label={row.category} size="small" sx={{ mb: 1.5 }} color="success" />
-                                                )}
-                                                &nbsp;<Chip label={row.indianName} size="small" sx={{ mb: 1.5, fontWeight: 800 }} variant='outlined' color="success" />
-                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1, lineHeight: 1.4 }}>
-                                                    {row.description || 'Fresh from local farms'}
-                                                </Typography>
-                                                <Typography variant="h4" sx={{ mb: 2, color: 'primary.main', fontWeight: 800 }}>
-                                                    ₹{row.pricePerKg || row.price}
-                                                    <Typography component="span" variant="h6">/kg</Typography>
-                                                </Typography>
-                                                {row.stock && (
-                                                    <Chip
-                                                        label={`Stock: ${row.stock}kg`}
-                                                        size="small"
-                                                        color={Number(row.stock) > 50 ? 'success' : 'warning'}
-                                                        sx={{ mb: 2 }}
-                                                    />
-                                                )}
-                                                <Box sx={{ mb: 1 }}>
+                                                <CardContent sx={{
+                                                    flexGrow: 1,
+                                                    p: { xs: 1.5, sm: 2, md: 2.5 }, // tighter on mobile
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    justifyContent: 'space-between'
+                                                }}>
+                                                    <Box sx={{ mb: { xs: 1, md: 2 } }}>
+                                                        <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
+                                                            {row.name}
+                                                        </Typography>
+                                                        {row.category && (
+                                                            <Chip label={row.category} size="small" sx={{ mb: 1 }} color="success" />
+                                                        )}
+                                                        <Chip
+                                                            label={row.indianName}
+                                                            size="small"
+                                                            sx={{ mb: 1.5, fontWeight: 800 }}
+                                                            variant='outlined'
+                                                            color="success"
+                                                        />
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="text.secondary"
+                                                            sx={{ mb: 1, lineHeight: 1.4 }}
+                                                        >
+                                                            {row.description || 'Fresh from local farms'}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="h4"
+                                                            sx={{
+                                                                mb: 2,
+                                                                color: 'primary.main',
+                                                                fontWeight: 800,
+                                                                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+                                                            }}
+                                                        >
+                                                            ₹{row.pricePerKg || row.price}
+                                                            <Typography component="span" variant="h6">/kg</Typography>
+                                                        </Typography>
+                                                        {row.stock && (
+                                                            <Chip
+                                                                label={`Stock: ${row.stock}kg`}
+                                                                size="small"
+                                                                color={Number(row.stock) > 50 ? 'success' : 'warning'}
+                                                                sx={{ mb: { xs: 1, md: 2 } }}
+                                                            />
+                                                        )}
+                                                    </Box>
                                                     <TextField
                                                         label="Quantity"
                                                         type="number"
@@ -204,43 +240,44 @@ const InventoryPage = () => {
                                                         inputProps={{ min: 10, max: 50000, step: 5 }}
                                                         value={quantities[row.sku || row.name] ?? 10}
                                                         onChange={(e) => handleQtyChange(row.sku || row.name, e.target.value)}
+                                                        sx={{ mb: 1.5 }}
                                                     />
-                                                </Box>
-                                            </CardContent>
-                                            <CardActions sx={{ p: 2, pt: 0 }}>
-                                                <Button
-                                                    fullWidth
-                                                    variant="contained"
-                                                    size="large"
-                                                    startIcon={<ShoppingCartIcon />}
-                                                    onClick={() => handleAddToCart(row)}
-                                                >
-                                                    Add to Cart
-                                                </Button>
-                                            </CardActions>
-                                        </Card>
-                                    </Grid>
-                                )
-                            ))}
-                        </Grid>
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center', mt: 3 }}>
-                            <Typography sx={{ mx: 1 }}>
-                                Showing {filteredRows.length === 0 ? 0 : 1} - {Math.min(visibleCount, filteredRows.length)} of {filteredRows.length}
-                            </Typography>
-                            <Button
-                                variant="contained"
-                                size='small'
-                                onClick={() => setVisibleCount((c) => Math.min(c + pageSize, filteredRows.length))}
-                                disabled={visibleCount >= filteredRows.length}
-                            >
-                                Load more
-                            </Button>
-                            {visibleCount > pageSize && (
-                                <Button variant="text" size='small' onClick={() => setVisibleCount(pageSize)}>
-                                    Show less
+                                                    <CardActions sx={{ p: 0, mt: 'auto' }}>
+                                                        <Button
+                                                            fullWidth
+                                                            variant="contained"
+                                                            size="large"
+                                                            startIcon={<ShoppingCartIcon />}
+                                                            onClick={() => handleAddToCart(row)}
+                                                        >
+                                                            Add to Cart
+                                                        </Button>
+                                                    </CardActions>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    )
+                                ))}
+                            </Grid>
+
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center', mt: 3 }}>
+                                <Typography sx={{ mx: 1 }}>
+                                    Showing {filteredRows.length === 0 ? 0 : 1} - {Math.min(visibleCount, filteredRows.length)} of {filteredRows.length}
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    size='small'
+                                    onClick={() => setVisibleCount((c) => Math.min(c + pageSize, filteredRows.length))}
+                                    disabled={visibleCount >= filteredRows.length}
+                                >
+                                    Load more
                                 </Button>
-                            )}
-                        </Box>
+                                {visibleCount > pageSize && (
+                                    <Button variant="text" size='small' onClick={() => setVisibleCount(pageSize)}>
+                                        Show less
+                                    </Button>
+                                )}
+                            </Box>
                         </>
                     )}
 

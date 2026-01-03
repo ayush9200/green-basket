@@ -6,7 +6,6 @@ import Typography from '@mui/joy/Typography';
 import Input from '@mui/joy/Input';
 import Table from '@mui/joy/Table';
 import { db } from '../firebase';
-import { getAuth } from 'firebase/auth';
 
 export default function CustomersTab() {
   const [customers, setCustomers] = React.useState([]);

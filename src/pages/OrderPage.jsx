@@ -1,4 +1,3 @@
-// src/pages/OrderPage.jsx
 import React from 'react';
 import {
   Box,
@@ -19,8 +18,12 @@ import { useProfile } from '../context/ProfileContext';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Link, Link as RouterLink } from 'react-router-dom';  
+import emailjs from '@emailjs/browser';
 
-const WHATSAPP_NUMBER = '+15551867262'; // Replace with actual number
+const WHATSAPP_NUMBER = '+15551867262';
+const PENDING_TEMPLATE_ID = 'template_hpujnfu';
+const SERVICE_ID = 'service_04pjjft';
+const PUBLIC_KEY = '0_1u1VbZliYOiBuT_'; 
 
 const OrderPage = () => {
   const { cart, updateQuantity, removeFromCart, totalAmount } = useCart();
@@ -62,41 +65,60 @@ if (!user || !profile) {
 
   const handlePlaceOrder = async () => {
     setStatus(null);
-    if (!profile) {
-      setStatus('profile-missing');
-      return;
-    }
-    if (!cart.length) {
-      setStatus('cart-empty');
+    if (!profile || !cart.length) {
+      setStatus(profile ? 'cart-empty' : 'profile-missing');
       return;
     }
 
     try {
-      const orderPayload = {
+      // 1. Save to Firestore with status: 'pending'
+      const orderRef = await addDoc(collection(db, 'orders'), {
         items: cart,
         totalAmount,
         profile,
+        address: profile.address,
+        phone: profile.phone,
         createdAt: serverTimestamp(),
-        status: 'pending',
+        status: 'Pending', // ← new field
         source: 'web-app',
-      };
-      await addDoc(collection(db, 'orders'), orderPayload);
+      });
 
-      const lines = cart.map(
-        (item) =>
-          `${item.name}: ${item.quantity}${item.unit || 'kg'} @ ₹${
-            item.pricePerKg
-          }/${item.unit || 'kg'}`
-      );
-      const message = encodeURIComponent(
-        `New wholesale order:\n\nBusiness: ${profile.business}\nContact: ${profile.name}\nPhone: ${profile.phone}\nAddress: ${profile.address}\n\nItems:\n${lines.join(
-          '\n'
-        )}\n\nTotal: ₹${totalAmount}\n\nPlease confirm availability and delivery slot.`
-      );
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-      window.open(url, '_blank');
+      const orderId = orderRef.id;
+
+      // 2. Send WhatsApp to USER (pending confirmation)
+      // const userMessage = `🛒 *Green Basket Order #${orderId}* (Pending)\n\n` +
+      //   `Business: ${profile.business}\n` +
+      //   `Items:\n${cart.map(i => `• ${i.name}: ${i.quantity}${i.unit}kg`).join('\n')}\n` +
+      //   `Total: ₹${totalAmount}\n\n` +
+      //   `📱 We'll confirm availability & delivery soon!`;
+
+      // const userWaUrl = `https://wa.me/${profile.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(userMessage)}`;
+      // window.open(userWaUrl, '_blank');
+
+      // 3. Email to user (via EmailJS - no backend needed)
+      await emailjs.send(SERVICE_ID, PENDING_TEMPLATE_ID, {
+        business: profile.business,
+        phone: profile.phone,
+        email: profile.email,
+        address: profile.address,
+        order_id: orderId,
+
+        items: cart.map(item => [
+          item.imageUrl || '',
+          item.name,
+          `${item.quantity}${item.unit || 'kg'}`,
+          `₹${item.pricePerKg * item.quantity}`
+        ]),
+
+        'shipping': 'Free Cash on Delivery',
+        'total': `₹${totalAmount}`,
+
+        to_email: profile.email,
+      }, PUBLIC_KEY);
+
       setStatus('success');
     } catch (e) {
+      console.error('Order failed:', e);
       setStatus('error');
     }
   };
@@ -105,8 +127,8 @@ if (!user || !profile) {
 
   return (
     <Box>
-      <Typography variant="h3" sx={{ m: 2 , p:2, fontWeight: 800,}}>
-        Your cart
+      <Typography variant="h3" sx={{ m: 2 , p:2, fontWeight: 600}}>
+        Your Green Cart
       </Typography>
 
       {!hasProfile && (
@@ -116,10 +138,10 @@ if (!user || !profile) {
       )}
 
       {!cart.length && (
-        <Alert sx={{ m: 2 }} severity="info">Your cart is empty. Add items from the homepage.</Alert>
+        <Alert sx={{ m: 2 }} severity="info">Your cart is empty. Add items from the inventory.</Alert>
       )}
 
-      <Grid container spacing={3} sx={{ mt: 2 }}>
+      <Grid container spacing={3} sx={{ m: { xs: 1, md: 2 } }} alignItems="flex-start">
         <Grid item xs={12} md={8}>
           {cart.map((item) => (
             <Card key={item.sku} sx={{ mb: 2 }}>
@@ -128,7 +150,12 @@ if (!user || !profile) {
                   {item.imageUrl && (
                     <CardMedia
                       component="img"
-                      sx={{ height: 120, width: 120, objectFit: 'cover' }}
+                      sx={{
+                        width: { xs: '100%', sm: 120, md: 140 },
+                        height: { xs: 100, sm: 120, md: 140 },
+                        objectFit: 'cover',
+                        borderRadius: 1,
+                      }}
                       image={item.imageUrl}
                       alt={item.name}
                     />
@@ -177,7 +204,7 @@ if (!user || !profile) {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Card sx={{ p: 2, position: 'sticky', top: 80 }}>
+          <Card sx={{ p: 2, position: { md: 'sticky' }, top: { md: 80 } }}>
             <Typography variant="h6" sx={{ mb: 1 }}>
               Order summary
             </Typography>
@@ -200,7 +227,7 @@ if (!user || !profile) {
               onClick={handlePlaceOrder}
               disabled={!cart.length}
             >
-              Place order via WhatsApp
+              Place order
             </Button>
 
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
