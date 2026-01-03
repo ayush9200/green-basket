@@ -15,9 +15,9 @@ export default function OrdersTab() {
   const [orders, setOrders] = React.useState([]);
   const [search, setSearch] = React.useState('');
 
-  const APPROVED_TEMPLATE_ID = 'template_u6oix7c'; 
-  const SERVICE_ID = 'service_04pjjft';
-  const PUBLIC_KEY = '0_1u1VbZliYOiBuT_'; 
+  const APPROVED_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_APPROVED_TEMPLATE_ID;
+  const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
   React.useEffect(() => {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
@@ -47,41 +47,43 @@ export default function OrdersTab() {
     );
   });
 
-  const approveOrder = async (orderDetailsl) => {
-  await updateDoc(doc(db, 'orders', orderId), {
-    status: 'Approved',
-    approvedAt: new Date(),
-  });
+  const approveOrder = async (orderDetails) => {
 
-  // WhatsApp confirmation to user
-  const confirmMsg = `✅ *Order #${orderId} CONFIRMED!*\n\n` +
-    `Ready for delivery. Please coordinate pickup/delivery timing via WhatsApp.`;
+    await updateDoc(doc(db, 'orders', orderDetails.id), {
+      status: 'Approved',
+      approvedAt: new Date(),
+    });
 
-  // const confirmUrl = `https://wa.me/${userPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(confirmMsg)}`;
-  // window.open(confirmUrl, '_blank');
+    // WhatsApp confirmation to user
+    const confirmMsg = `✅ *Order #${orderDetails.profile?.id} CONFIRMED!*\n\n` +
+      `Ready for delivery. Please coordinate pickup/delivery timing via WhatsApp.`;
 
-  // Email confirmation via EmailJS
-  await emailjs.send(SERVICE_ID, APPROVED_TEMPLATE_ID, {
-        business: profile.business,
-        phone: profile.phone,
-        email: profile.email,
-        address: profile.address,
-        order_id: orderId,
+    // const confirmUrl = `https://wa.me/${userPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(confirmMsg)}`;
+    // window.open(confirmUrl, '_blank');
 
-        items: cart.map(item => [
-          item.imageUrl || '',
-          item.name,
-          `${item.quantity}${item.unit || 'kg'}`,
-          `₹${item.pricePerKg * item.quantity}` // {{item_price}}
-        ]),
+    // Email confirmation via EmailJS
+    await emailjs.send(SERVICE_ID, APPROVED_TEMPLATE_ID, {
+      business: orderDetails.profile?.business,
+      phone: orderDetails.profile?.phone,
+      email: orderDetails.profile?.email,
+      address: orderDetails.profile?.address,
+      order_id: orderDetails.profile?.id,
 
-        'shipping': 'Free Cash on Delivery',
-        'total': `₹${totalAmount}`,
+      items: orderDetails.items?.map(item => [
+        item.imageUrl || '',
+        item.name,
+        `${item.quantity}${item.unit || 'kg'}`,
+        `₹${item.pricePerKg * item.quantity}` // {{item_price}}
+      ]),
 
-        to_email: profile.email,
+      shipping: 'Free Cash on Delivery',
+      total: `₹${orderDetails.totalAmount}`,
 
-      }, PUBLIC_KEY);
-};
+      to_email: orderDetails.profile?.email,
+
+    }, PUBLIC_KEY);
+    alert(`Order #${orderDetails.profile?.id} approved and confirmation email sent to user.`);
+  };
 
   return (
     <Stack spacing={1.5}>
@@ -132,10 +134,10 @@ export default function OrdersTab() {
           <tbody>
             {filtered.map((o) => (
               <tr key={o.id}>
-                <td>{o.name}</td>
+                <td>{o.profile?.business}</td>
                 <td>{o.phone}</td>
                 <td>{o.address}</td>
-                <td>{o.orderText}</td>
+                <td>{o.items?.map(item => `${item.name} (${item.quantity}${item.unit || 'kg'})`).join(', ')}</td>
                 <td>
                   <Chip size="sm" variant="soft">
                     {o.source || 'N/A'}
@@ -160,12 +162,12 @@ export default function OrdersTab() {
                     {o.status || 'Pending'}
                   </Chip>
                 </td>
-                <td style={{justifyContent:"center", alignContent:"center", alignItems:"center"}}>
+                <td style={{ justifyContent: "center", alignContent: "center", alignItems: "center" }}>
                   {o.status !== 'Approved' && (
                     <Button
                       size="sm"
                       variant="soft"
-                      onClick={(o) => approveOrder(o)}
+                      onClick={() => approveOrder(o)}
                     >
                       Approve
                     </Button>

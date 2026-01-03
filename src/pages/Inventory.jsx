@@ -158,7 +158,7 @@ const InventoryPage = () => {
                                                     boxShadow: 2,
                                                     // Wider cards that fill space better
                                                     width: {
-                                                        xs: 'calc(50vw - 8px)',  // nearly full width on mobile
+                                                        xs: 'calc(80vw - 8px)',  // nearly full width on mobile
                                                         sm: 250,
                                                         md: 280,
                                                         lg: 320,

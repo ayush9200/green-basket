@@ -21,9 +21,9 @@ import { Link, Link as RouterLink } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 
 const WHATSAPP_NUMBER = '+15551867262';
-const PENDING_TEMPLATE_ID = 'template_hpujnfu';
-const SERVICE_ID = 'service_04pjjft';
-const PUBLIC_KEY = '0_1u1VbZliYOiBuT_'; 
+const PENDING_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_PENDING_TEMPLATE_ID;
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY; 
 
 const OrderPage = () => {
   const { cart, updateQuantity, removeFromCart, totalAmount } = useCart();
@@ -110,8 +110,8 @@ if (!user || !profile) {
           `₹${item.pricePerKg * item.quantity}`
         ]),
 
-        'shipping': 'Free Cash on Delivery',
-        'total': `₹${totalAmount}`,
+        shipping: 'Free Cash on Delivery',
+        total: `₹${totalAmount}`,
 
         to_email: profile.email,
       }, PUBLIC_KEY);
