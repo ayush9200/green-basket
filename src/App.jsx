@@ -27,7 +27,10 @@ import InventoryPage from './pages/Inventory';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import { useProfile } from './context/ProfileContext';
-import HeaderLogo from './assets/logo_header.png';
+import HeaderLogoLight from './assets/logo_light_header.png';
+import HeaderLogoLight2 from './assets/logo_light_header_2.png';
+import HeaderLogoDark from './assets/logo_dark_header.png';
+
 import AdminDashboard from './components/AdminDashboard';
 
 const App = ({ mode, toggleMode }) => {
@@ -60,9 +63,13 @@ const App = ({ mode, toggleMode }) => {
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
       
       {/* Responsive AppBar */}
+      {/* bgcolor: (mode) => mode === 'light' ? 'background.default' : '#232a36' 
+      // (mode === 'light') ? 'linear-gradient(to right, #f2f4f0 5%, #2e7e33 95%)' : 'linear-gradient(to right, #242a36 40%, #3c3b3b) 60%', 
+      */}
       <AppBar position="sticky">
-        <Toolbar sx={{ alignItems: 'center' }}>
-          
+        <Toolbar sx={{ alignItems: 'center', background: 
+          (mode === 'light') ? 'linear-gradient(to right, #f2f4f0 100px, #2e7e33 25%)' : 'linear-gradient(to right, #242a36 40%, #3c3b3b) 60%', }}>
+
           {/* Logo - always left, responsive size */}
           <IconButton
             edge="start"
@@ -73,11 +80,11 @@ const App = ({ mode, toggleMode }) => {
             <Box
               component="img"
               sx={{
-                height: { xs: 48, sm: 56, md: 64 },
+                height: { xs: 52, sm: 56, md: 64 },
                 cursor: 'pointer',
               }}
               alt="Green Basket"
-              src={HeaderLogo}
+              src={mode === 'light' ? HeaderLogoLight : HeaderLogoDark}
             />
           </IconButton>
 

@@ -14,8 +14,8 @@ import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { useProfile } from '../context/ProfileContext';
 import { useNavigate } from 'react-router-dom';
-import LightLogo from '../assets/LightCropped.png';
-import DarkLogo from '../assets/DarkCropper.png';
+import LightLogo from '../assets/green_basket_light.png';
+import DarkLogo from '../assets/green_basket_dark.png';
 
 const ProfilePage = () => {
   const { profile, loading: profileLoading, user } = useProfile();
@@ -168,18 +168,20 @@ const ProfilePage = () => {
 
             {/* Auth mode header */}
             <Stack alignItems="center" sx={{ mb: 2 }}>
-              <Typography variant="h4" sx={{ mb: 2, color: 'success.main' }}>
+              {/* <Typography variant="h4" sx={{ mb: 2, color: 'success.main' }}>
                 {isEditMode
                   ? 'My Profile'
                   : isSignup
                     ? 'Join Green Basket'
                     : 'Welcome to Green Basket'}
-              </Typography>
+              </Typography> */}
               <Box
                 component="img"
                 sx={{
-                  height: 150,
-                  marginRight: 2, // Add some spacing to the right of the logo
+                  height: { xs: 200, sm: 200, md: 250 },
+                  width: { xs: 200, sm: 200, md: 250 },
+                  display: 'block',
+                  borderRadius: 13, // Add some spacing to the right of the logo
                 }}
                 alt="Green Basket Logo"
                 src={theme.palette.mode === 'dark' ? DarkLogo : LightLogo} // Use the imported image variable

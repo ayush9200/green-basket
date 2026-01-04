@@ -22,7 +22,8 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useCart } from '../context/CartContext';
-import { Link as RouterLink } from 'react-router-dom';
+import { useProfile } from '../context/ProfileContext';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
@@ -48,6 +49,9 @@ const HomePage = () => {
 
   const rows = !loading && !error ? data[0]?.data || [] : [];
 
+  const { user } = useProfile();
+  const navigate = useNavigate();
+
   React.useEffect(() => {
     const id = setInterval(() => {
       setCarouselIndex((prev) => (prev + 1) % carouselItems.length);
@@ -65,6 +69,11 @@ const HomePage = () => {
   };
 
   const handleAddToCart = (row) => {
+    if (!user) {
+      navigate('/profile');
+      return;
+    }
+
     const key = row.sku || row.name;
     const qty = quantities[key] ?? 10;
     const product = {
@@ -325,7 +334,7 @@ const HomePage = () => {
                   transition: 'transform 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-8px)',
-                    backgroundColor: "#e0ece1ff"
+                    backgroundColor:  theme.palette.mode === 'dark' ? "#507350ff" : "#e0ece1ff",
                   },
                 }}
               >
@@ -363,6 +372,14 @@ const HomePage = () => {
                       }}
                     >
                       ₹{row.pricePerKg || row.price}/kg
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        mb: 2,
+                      }}
+                    >
+                      Min Order: {row.minOrder || 10} kg
                     </Typography>
                   </Box>
                   <Button
@@ -432,7 +449,8 @@ const HomePage = () => {
                   '&:hover': {
                     transform: 'scale(1.05)',
                     variant: 'outlined',
-                    backgroundColor: "#e0ece1ff"
+                    //backgroundColor: "#e0ece1ff"
+                    backgroundColor:  theme.palette.mode === 'dark' ? "#81c784" : "#e0ece1ff",
                   }
                 }}
               >
@@ -568,7 +586,7 @@ const HomePage = () => {
               <StepLabel StepIconComponent={QunatStepIcon}>
                 <Stack orientation={isSm ? "vertical" : "horizontal"} sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
-                    WhatsApp Order
+                    Place Order
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Review cart & send
@@ -589,7 +607,7 @@ const HomePage = () => {
                     Team Confirms
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Via WhatsApp chat
+                    Via Email
                   </Typography>
                   <Chip label="Within 30 mins" color="success" size="medium" sx={{ mt: 1 }} />
                 </Stack>
