@@ -80,7 +80,7 @@ const App = ({ mode, toggleMode }) => {
             <Box
               component="img"
               sx={{
-                height: { xs: 52, sm: 56, md: 64 },
+                height: { xs: 56, sm: 56, md: 64 },
                 cursor: 'pointer',
               }}
               alt="Green Basket"
