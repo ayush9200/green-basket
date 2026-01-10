@@ -68,7 +68,7 @@ const App = ({ mode, toggleMode }) => {
       */}
       <AppBar position="sticky">
         <Toolbar sx={{ alignItems: 'center', background: 
-          (mode === 'light') ? 'linear-gradient(to right, #f2f4f0 100px, #2e7e33 25%)' : 'linear-gradient(to right, #242a36 40%, #3c3b3b) 60%', }}>
+          (mode === 'light') ? 'linear-gradient(to right, #f2f4f0, #2e7e33 25%)' : 'linear-gradient(to right, #242a36 40%, #3c3b3b) 60%', }}>
 
           {/* Logo - always left, responsive size */}
           <IconButton
@@ -81,6 +81,7 @@ const App = ({ mode, toggleMode }) => {
               component="img"
               sx={{
                 height: { xs: 56, sm: 56, md: 64 },
+                width: { xs: '13pc', sm: '13pc', md: '15pc' },
                 cursor: 'pointer',
               }}
               alt="Green Basket"
